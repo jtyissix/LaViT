@@ -4,6 +4,7 @@
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv:2601.10129-b31b1b.svg)](https://arxiv.org/abs/2601.10129)
 [![Model](https://img.shields.io/badge/🤗%20HuggingFace-Model-yellow.svg)](https://huggingface.co/Svard/LaViT-3B)
+[![Dataset](https://img.shields.io/badge/🤗%20HuggingFace-Dataset-orange.svg)](https://huggingface.co/datasets/Svard/LaViT_15k/tree/main)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 </div>
@@ -191,7 +192,7 @@ This project is implemented based on the Qwen2.5-VL model. Thanks to the support
 ## 📋 TODO
 
 - [x] Release LaViT-3B model weights
-- [ ] Upload complete training dataset LaViT-15k
+- [x] Upload complete training dataset LaViT-15k
 
 ## 📖 Citation
 
@@ -213,4 +214,5 @@ If you find this repository useful in your research, please consider citing our 
 
 - **Paper**: [arXiv:2601.10129](https://arxiv.org/abs/2601.10129)
 - **HuggingFace Model**: [Svard/LaViT-3B](https://huggingface.co/Svard/LaViT-3B)
+- **HuggingFace Dataset**: [Svard/LaViT_15k](https://huggingface.co/datasets/Svard/LaViT_15k/tree/main)
 - **Base Model**: [Qwen2.5-VL-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)

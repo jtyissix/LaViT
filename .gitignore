@@ -3,7 +3,7 @@
 # LaViT-15k Dataset (too large for GitHub, ~150GB)
 # Dataset should be hosted on external storage (Hugging Face, Zenodo, etc.)
 LaViT-15k/
-
+LaViT-15k-reorganized/
 # Python
 __pycache__/
 *.py[cod]
