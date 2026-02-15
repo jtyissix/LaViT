@@ -4,7 +4,7 @@
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv:2601.10129-b31b1b.svg)](https://arxiv.org/abs/2601.10129)
 [![Model](https://img.shields.io/badge/🤗%20HuggingFace-Model-yellow.svg)](https://huggingface.co/Svard/LaViT-3B)
-[![Dataset](https://img.shields.io/badge/🤗%20HuggingFace-Dataset-orange.svg)](https://huggingface.co/datasets/Svard/LaViT_15k/tree/main)
+[![Dataset](https://img.shields.io/badge/🤗%20HuggingFace-Dataset-orange.svg)](https://huggingface.co/datasets/Svard/LaViT-15k)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 </div>
