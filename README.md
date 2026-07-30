@@ -3,11 +3,14 @@
 <div align="center">
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv:2601.10129-b31b1b.svg)](https://arxiv.org/abs/2601.10129)
+[![ECCV 2026](https://img.shields.io/badge/ECCV-2026-5c2d91.svg)](https://eccv.ecva.net/)
 [![Model](https://img.shields.io/badge/🤗%20HuggingFace-Model-yellow.svg)](https://huggingface.co/Svard/LaViT-3B)
 [![Dataset](https://img.shields.io/badge/🤗%20HuggingFace-Dataset-orange.svg)](https://huggingface.co/datasets/Svard/LaViT-15k)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 </div>
+
+> 🎉 **LaViT has been accepted to ECCV 2026.**
 
 This repository contains the official implementation of **LaViT**, a method for training vision-language models through visual thought trajectory supervision. LaViT extracts visual reasoning processes from large teacher models and uses them as supervision signals to train smaller, more efficient student models.
 
