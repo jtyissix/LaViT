@@ -566,7 +566,8 @@ def run_inference(
             prompt_ids = inputs["input_ids"][0]
             prompt_length = int(prompt_ids.shape[0])
             image_positions = (
-                torch.flatnonzero(prompt_ids == image_token_id)
+                (prompt_ids == image_token_id)
+                .nonzero(as_tuple=True)[0]
                 .to(device="cpu", dtype=torch.int64)
                 .numpy()
                 .astype(np.int32, copy=False)
