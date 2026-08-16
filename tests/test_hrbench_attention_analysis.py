@@ -13,6 +13,7 @@ from evaluation.utils.hrbench_attention_analysis import (
     SOURCE_INPUT_VISUAL,
     SOURCE_LATENT,
     SOURCE_SPECIAL,
+    _validate_and_renormalize_attention,
     assemble_sample_archive,
     build_category_attention_csv_rows,
     build_latent_topk_csv_rows,
@@ -43,6 +44,34 @@ class FakeTokenizer:
 
 
 class AttentionAnalysisHelpersTest(unittest.TestCase):
+    def test_bfloat16_sum_drift_is_renormalized(self):
+        matrix = np.asarray([
+            [0.4997005, 0.4997005],
+            [0.5003145, 0.5003145],
+        ], dtype=np.float32)
+        normalized = _validate_and_renormalize_attention(matrix)
+        np.testing.assert_allclose(
+            normalized.sum(axis=1), np.ones(2), atol=1e-7, rtol=0.0
+        )
+        np.testing.assert_allclose(normalized, [[0.5, 0.5], [0.5, 0.5]])
+
+    def test_exact_attention_is_unchanged(self):
+        matrix = np.asarray([[0.25, 0.75]], dtype=np.float32)
+        normalized = _validate_and_renormalize_attention(matrix)
+        np.testing.assert_array_equal(normalized, matrix)
+
+    def test_invalid_attention_sums_and_values_are_rejected(self):
+        invalid_matrices = [
+            np.asarray([[0.4, 0.5]], dtype=np.float32),
+            np.asarray([[0.0, 0.0]], dtype=np.float32),
+            np.asarray([[np.nan, 1.0]], dtype=np.float32),
+            np.asarray([[np.inf, 0.0]], dtype=np.float32),
+        ]
+        for matrix in invalid_matrices:
+            with self.subTest(matrix=matrix):
+                with self.assertRaises(RuntimeError):
+                    _validate_and_renormalize_attention(matrix)
+
     def test_selection_is_deterministic(self):
         first = select_sample_indices(20, "random", 0, 5, 7)
         second = select_sample_indices(20, "random", 0, 5, 7)

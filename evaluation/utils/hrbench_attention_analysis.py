@@ -68,6 +68,7 @@ STOP = None
 
 LATENT_TOP_K = 20
 ATTENTION_STORAGE_DTYPE = "float16"  # "float16" or "float32"
+ATTENTION_SUM_TOLERANCE = 5e-3       # BF16/eager softmax accumulation error
 # Fixed semantics selected for this analysis. They are explicit globals so a
 # run_config snapshot documents them rather than hiding them in helper logic.
 ANSWER_SCOPE = "all_non_latent_text"
@@ -406,13 +407,39 @@ def _extract_query_attention(
         row = weights[0, :, 0, :source_count].float().mean(dim=0)
         rows.append(row.to(device="cpu").numpy())
     matrix = np.stack(rows).astype(np.float32, copy=False)
-    sums = matrix.sum(axis=1)
-    if not np.allclose(sums, 1.0, atol=2e-4, rtol=2e-4):
+    return _validate_and_renormalize_attention(matrix)
+
+
+def _validate_and_renormalize_attention(
+    matrix: np.ndarray,
+    tolerance: float = ATTENTION_SUM_TOLERANCE,
+) -> np.ndarray:
+    """Validate head-mean attention and remove low-precision sum drift."""
+    matrix = np.asarray(matrix, dtype=np.float32)
+    if matrix.ndim != 2:
+        raise RuntimeError(
+            "Captured head-mean attention must be a [layer, source] matrix; "
+            f"received shape {matrix.shape}."
+        )
+    if tolerance <= 0:
+        raise ValueError("Attention sum tolerance must be positive.")
+    if not np.isfinite(matrix).all():
+        raise RuntimeError("Captured head-mean attention contains NaN or Inf.")
+    sums = matrix.sum(axis=1, dtype=np.float64)
+    if np.any(sums <= 0):
+        raise RuntimeError(
+            "Captured head-mean attention has a non-positive layer sum."
+        )
+    if not np.allclose(sums, 1.0, atol=tolerance, rtol=0.0):
         raise RuntimeError(
             "Captured head-mean attention does not sum to one; layer sums "
-            f"range from {sums.min():.6f} to {sums.max():.6f}."
+            f"range from {sums.min():.6f} to {sums.max():.6f} "
+            f"(tolerance={tolerance:.6f})."
         )
-    return matrix
+    # Eager attention can return BF16 probabilities whose accumulated sums
+    # differ slightly from one. Normalize in float32 before float16 archival so
+    # category masses and downstream plots share one exact probability basis.
+    return matrix / sums.astype(np.float32, copy=False)[:, None]
 
 
 def select_answer_token_indices(
@@ -764,7 +791,10 @@ def assemble_sample_archive(
                 generated_ids,
                 special_token_ids,
             )
-            tolerance = 5e-3 if dtype == np.dtype("float16") else 2e-4
+            tolerance = (
+                ATTENTION_SUM_TOLERANCE
+                if dtype == np.dtype("float16") else 2e-4
+            )
             if not np.allclose(
                 raw.astype(np.float32).sum(axis=1),
                 1.0,
@@ -1208,7 +1238,8 @@ def global_config_snapshot() -> dict[str, Any]:
         "DEVICE", "TORCH_DTYPE", "TRUST_REMOTE_CODE", "USE_CACHE",
         "MIN_PIXELS", "MAX_PIXELS", "MAX_OUTPUT_TOKENS", "TEMPERATURE",
         "TOP_K", "TOP_P", "REPETITION_PENALTY", "BEST_OF", "STOP",
-        "LATENT_TOP_K", "ATTENTION_STORAGE_DTYPE", "ANSWER_SCOPE",
+        "LATENT_TOP_K", "ATTENTION_STORAGE_DTYPE", "ATTENTION_SUM_TOLERANCE",
+        "ANSWER_SCOPE",
         "LATENT_TOPK_SOURCE", "CLEAN_LATENT_MARKER", "PLOT_LAYER",
         "PLOT_DPI", "PLOT_MAX_TOKEN_LABELS", "PLOT_FIGURE_WIDTH",
         "PLOT_ROW_HEIGHT",
