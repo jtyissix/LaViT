@@ -44,7 +44,7 @@ RUN_CONFIG_FILE = "run_config.json"
 # "random": deterministic sampling without replacement using RANDOM_SEED
 SELECTION_MODE = "random"
 START_INDEX = 0
-NUM_SAMPLES = 10
+NUM_SAMPLES = 800
 RANDOM_SEED = 0
 
 DEVICE = "cuda"

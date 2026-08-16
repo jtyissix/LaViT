@@ -5,6 +5,8 @@ accelerate
 Pillow
 pandas
 numpy
+matplotlib
+pyarrow
 tqdm
 wandb
 scipy
